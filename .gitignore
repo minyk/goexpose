@@ -30,4 +30,5 @@ _testmain.go
 cmd/goexpose/goexpose
 
 run.sh
-build/
+build/.idea
+*.iml
