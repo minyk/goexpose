@@ -78,10 +78,15 @@ import (
 Creates new json response
 */
 func NewResponse(status int) (response *Response) {
+	return NewResponseWithContentType(status, "application/json")
+}
+
+func NewResponseWithContentType(status int, contentType string) (response *Response) {
 	response = &Response{
 		data: map[string]interface{}{},
 	}
 	response.Status(status)
+	response.contentType = contentType
 	return
 }
 
@@ -91,6 +96,8 @@ Response
 type Response struct {
 	status int
 	pretty bool
+
+	contentType string
 
 	// json data
 	data map[string]interface{}
@@ -208,7 +215,7 @@ func (r *Response) Write(w http.ResponseWriter, req *http.Request, start ...time
 	)
 
 	// add headers
-	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Content-Type", r.contentType)
 	w.WriteHeader(r.status)
 
 	// write body

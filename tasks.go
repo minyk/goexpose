@@ -21,6 +21,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"bytes"
 )
 
 func init() {
@@ -44,6 +45,8 @@ type ShellTaskConfig struct {
 	Env               map[string]string         `json:"env"`
 	Shell             string                    `json:"shell"`
 	Commands          []*ShellTaskConfigCommand `json:"commands"`
+	Output            string                    `json:"output"`
+	ContentType       string                    `json:"content_type"`
 	SingleResult      *int                      `json:"single_result"`
 	singleResultIndex int                       `json:"-"`
 }
@@ -105,9 +108,11 @@ func ShellTaskFactory(server *Server, taskconfig *TaskConfig, ec *EndpointConfig
 		return
 	}
 
-	tasks = []Tasker{&ShellTask{
-		Config: config,
-	}}
+	tasks = []Tasker{
+		&ShellTask{
+			Config: config,
+		}}
+
 	return
 }
 
@@ -129,13 +134,22 @@ func (s *ShellTask) Run(r *http.Request, data map[string]interface{}) (response 
 
 	results := []*Response{}
 
-	response = NewResponse(http.StatusOK)
+	if s.Config.ContentType == "" {
+		response = NewResponse(http.StatusOK)
+	} else {
+		response = NewResponseWithContentType(http.StatusOK, s.Config.ContentType)
+	}
 
 	// run all commands
 	for _, command := range s.Config.Commands {
 
 		// strip status data from response
-		cmdresp := NewResponse(http.StatusOK).StripStatusData()
+		var cmdresp *Response
+		if s.Config.ContentType == "" {
+			cmdresp = NewResponse(http.StatusOK)
+		} else {
+			cmdresp = NewResponseWithContentType(http.StatusOK, s.Config.ContentType)
+		}
 
 		var (
 			b            string
@@ -186,11 +200,19 @@ func (s *ShellTask) Run(r *http.Request, data map[string]interface{}) (response 
 		results = append(results, cmdresp.StripStatusData())
 	}
 
-	// single result
-	if s.Config.singleResultIndex != -1 {
-		response.Result(results[s.Config.singleResultIndex])
+	if s.Config.Output == "raw" {
+		var buf bytes.Buffer
+		for _, res := range results {
+			buf.WriteString(res.data["result"].(string))
+			buf.WriteString("\n")
+		}
+		response.Raw(buf.Bytes())
 	} else {
-		response.Result(results)
+		if s.Config.singleResultIndex != -1 {
+			response.Result(results[s.Config.singleResultIndex])
+		} else {
+			response.Result(results)
+		}
 	}
 
 	return

@@ -32,3 +32,4 @@ cmd/goexpose/goexpose
 run.sh
 build/.idea
 *.iml
+build

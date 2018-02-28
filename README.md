@@ -1,5 +1,13 @@
 # Goexpose
 
+Forked from [phonkee/goexpose](https://github.com/phonkee/goexpose) with the following changes:
+
+* Apply [commit 42d8b95 from pflanno](https://github.com/pflanno/goexpose/commit/42d8b95f4823bcc2cfe75dffb72650937ce23c50)
+  which fixes the `request.Body` field
+* Adapt changes from [nasoym/goexpose](https://github.com/nasoym/goexpose) which supports returning the raw output
+  of a shell task in the HTTP response instead of wrapping it into JSON
+* Support specifying the HTTP content type of shell tasks; this is useful if a shell task uses the `raw` output
+
 Goexpose is lightweight json api server that maps url path to various tasks.
 Goexpose can be used in various scenarios: either make call commands on your servers (or 
 farm of servers), or you can use it as monitoring tool.
@@ -244,6 +252,8 @@ Configuration:
 
 * env - custom environment variables
 * shell - shell to run command with
+* output - set to `raw` to return the raw output of the shell script in the HTTP response (i.e. not wrapping it in JSON)
+* content_type - The `Content-Type` HTTP header to set, defaults to `application/json` if not specified
 * commands - list of commands to be called:
     * command - shell command to be run, interpolated (see Interpolation)
     * chdir - change directory before run command
