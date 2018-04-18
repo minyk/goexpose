@@ -13,7 +13,7 @@ import (
 	"os"
 
 	"github.com/golang/glog"
-	"github.com/linkyard/goexpose"
+	"goexpose"
 )
 
 func main() {

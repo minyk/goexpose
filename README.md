@@ -9,7 +9,7 @@ Forked from [phonkee/goexpose](https://github.com/phonkee/goexpose) with the fol
 * Support specifying the HTTP content type of shell tasks; this is useful if a shell task uses the `raw` output
 
 Goexpose is lightweight json api server that maps url path to various tasks.
-Goexpose can be used in various scenarios: either make call commands on your servers (or 
+Goexpose can be used in various scenarios: either make call commands on your servers (or
 farm of servers), or you can use it as monitoring tool.
 Builtin tasks are currently:
 
@@ -63,7 +63,7 @@ Lets see example configuration file:
 }
 ```
 
-This means that Goexpose will listen on https://127.0.0.1:9900 
+This means that Goexpose will listen on https://127.0.0.1:9900
 "endpoints" is a list of defined endpoints that goexpose responds to.
 
 You can also write your configuration in yaml format(command line arg `-format`)
@@ -72,7 +72,7 @@ You can also write your configuration in yaml format(command line arg `-format`)
 
 * host - host that we will listen on
 * port - port number
-* ssl - ssl settings 
+* ssl - ssl settings
     * cert - cert file
     * key - key file
 * reload_env - reload env variables on every request
@@ -80,21 +80,36 @@ You can also write your configuration in yaml format(command line arg `-format`)
     * path - url path
     * authorizers - list of authorizers applied to this endpoint (see Authorizers)
     * methods - dictionary that maps http method to task
-        
+
 
 ## Installation:
 
-Run go install 
-    
+Run go install
+
     go install github.com/phonkee/goexpose
 
+## Containerization
+* build
+```
+$ make
+```
+
+* test with example configuration.
+```
+$ make test
+```
+
+* push image
+```
+$ make push
+```
 
 ## Interpolation:
 
 Goexpose provides various variables from url, query, request.
 This data is available in commands to interpolate various strings.
 text/template is used and available data is in this structure:
-   
+
 ```json
 {
     "url": {},
@@ -146,7 +161,7 @@ Configuration:
 http task and shell task have possibility to set format of response.
 Currently available formats are: "json", "jsonlines", "lines", "text".
 Format can be combination of multiple formats. e.g.
-    
+
     "format": "json|jsonlines"
 
 First format that returns result without error will be used.
@@ -154,7 +169,7 @@ If "text" is not found in format, it is automatically inserted to the end.
 
 ## Tasks:
 
-Tasks can be configured in config["methods"] which is a map[string]TaskConfig - 
+Tasks can be configured in config["methods"] which is a map[string]TaskConfig -
 http method to task.
 Every task config has common part and configuration for given task.
 Common configuration is:
@@ -289,7 +304,7 @@ Run queries on postgres database. Configuration for postgres task:
 
 Configuration:
 
-* return_queries - whether queries with args should be added 
+* return_queries - whether queries with args should be added
 * queries - list of queries
     * url - postgres url (passed to sql.Open, refer to https://github.com/lib/pq), interpolated (see Interpolation)
     * methods - allowed methods, if not specified all methods are allowed
@@ -319,9 +334,9 @@ Task that can run multiple commands on redis. Example:
     }
 }
 ```
-    
+
 Configuration:
-  
+
 * address - address to connect to (see http://godoc.org/github.com/garyburd/redigo/redis#Dial)
     Default: ":6379", interpolated (see Interpolation)
 * network - network (see http://godoc.org/github.com/garyburd/redigo/redis#Dial)
@@ -457,7 +472,7 @@ In following example we serve only one file on url /file/some. The output will b
 }
 ```
 
-In next example we will serve files in directory and provide index page for directories and also give possibility to 
+In next example we will serve files in directory and provide index page for directories and also give possibility to
 return raw file as response.
 
 ```json
@@ -556,7 +571,7 @@ Support for LDAP authentication.
 
 Configuration:
 * host - host of ldap server (default `localhost`)
-* port - port of ldap server (default `389`) 
+* port - port of ldap server (default `389`)
 * network - one of `tcp`, `tls` (default `tcp`)
 * whitelist - list of usernames that can access goexpose endpoint
 * blacklist - list of usernames that are blacklisted to access endpoint
@@ -591,6 +606,6 @@ You can find example [here!](example/config.json) or [yaml!](example/config.yaml
 
 @TODO:
 Add tasks for: sqlite, memcached, mongodb
-  
+
 ## Author:
 phonkee
